@@ -44,7 +44,11 @@ class MapContainer extends React.Component<IMapProps, IMapState> {
 
   get restaurants(): IRestaurant[] { return this.props.restaurant!.restaurants; }
 
-  get bounds() { return this.restaurants.map(({ latitude: lat, longitude: lng }) => (lat && lng && { lat, lng })) }
+  get bounds() {
+    const bounds = new this.props.google!.maps.LatLngBounds();
+    this.restaurants.forEach(({ latitude: lat, longitude: lng }) => lat && lng && bounds.extend({ lat, lng }))
+    return bounds;
+  }
 
   public renderMarker = (restaurant: IRestaurant) => {
     return (
@@ -61,7 +65,7 @@ class MapContainer extends React.Component<IMapProps, IMapState> {
     return (
       <Container>
         <Map
-          zoom={17}
+          zoom={16}
           className='map'
           style={{ width: '100%', height: '100%', position: 'relative' }}
           google={this.props.google!}

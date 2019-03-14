@@ -26,7 +26,6 @@ export default class Cards extends React.Component<ICardProps> {
   public renderRestaurant = ({ name, hours, categories, images, id }: IRestaurant) => {
     const today: string = daysOfWeek[new Date().getDay()];
     const hoursToday = hours!.filter(({ day }) => day === today);
-
     return (
       <RestaurantCard
         name={name}
@@ -34,7 +33,7 @@ export default class Cards extends React.Component<ICardProps> {
         startTime={hoursToday[0].openTime}
         endTime={hoursToday[0].closeTime}
         image={images![0].url}
-        id={id}
+        key={id}
       />
     )
   }
@@ -55,7 +54,6 @@ interface IRestaurtCardProps {
   endTime?: string;
   distance?: string;
   image?: string;
-  id?: string;
 }
 
 const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
@@ -65,11 +63,10 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
   endTime,
   image,
   distance,
-  id
 }) => {
   const formatTime = (time: string) => moment(time, ['h:m a', 'H:m']).format('h:mma')
   return (
-    <li key={id} className="uk-card uk-card-default uk-card-hover">
+    <li className="uk-card uk-card-default uk-card-hover">
       <a className="card">
         <div className="card-image">
           <img src={image} />
