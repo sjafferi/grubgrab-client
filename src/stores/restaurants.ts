@@ -2,13 +2,32 @@ import { action, computed, observable } from 'mobx';
 import { RootStore, IUser } from './index';
 import { fetchRestaurants } from 'api'
 
+export interface IRestaurantImages {
+  id?: string;
+  url: string;
+  description: string;
+}
+
+export interface IRestaurantHours {
+  id?: string;
+  day: string;
+  openTime: string;
+  closeTime: string;
+}
+
 export interface IRestaurant {
   id?: string,
   owner?: IUser,
   name: string,
   city: string,
   address: string,
+  postalCode: string,
+  longitude: number,
+  latitude: number,
   description: string,
+  categories?: string[],
+  hours?: IRestaurantHours[],
+  images?: IRestaurantImages[],
 }
 
 export class Restaurant {
@@ -35,8 +54,6 @@ export class Restaurant {
     if (result) {
       this.restaurants = result;
     }
-
-    console.log({ result, error })
 
     return { result, error };
   }

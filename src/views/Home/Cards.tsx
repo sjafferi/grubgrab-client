@@ -1,8 +1,11 @@
 import * as React from "react";
+import * as moment from 'moment';
 import styled from "styled-components";
 import { Header3 } from 'ui';
 import { inject, observer } from "mobx-react";
-import { User, RouterStore, Restaurant } from 'stores';
+import { User, RouterStore, Restaurant, IRestaurant } from 'stores';
+
+const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
 interface ICardProps {
   user?: User;
@@ -18,13 +21,28 @@ export default class Cards extends React.Component<ICardProps> {
     this.props.restaurant!.fetch();
   }
 
+  get restaurants() { return this.props.restaurant!.restaurants; }
+
+  public renderRestaurant = ({ name, hours, categories, images, id }: IRestaurant) => {
+    const today: string = daysOfWeek[new Date().getDay()];
+    const hoursToday = hours!.filter(({ day }) => day === today);
+
+    return (
+      <RestaurantCard
+        name={name}
+        description={categories!.slice(0, 3).join(', ')}
+        startTime={hoursToday[0].openTime}
+        endTime={hoursToday[0].closeTime}
+        image={images![0].url}
+        id={id}
+      />
+    )
+  }
+
   public render() {
     return (
       <Container>
-        <RestaurantCard name="Shawarma Plus" />
-        <RestaurantCard name="Shawarma Plus" />
-        <RestaurantCard name="Shawarma Plus" />
-        <RestaurantCard name="Shawarma Plus" />
+        {this.restaurants.map(this.renderRestaurant)}
       </Container>
     );
   }
@@ -36,6 +54,8 @@ interface IRestaurtCardProps {
   startTime?: string;
   endTime?: string;
   distance?: string;
+  image?: string;
+  id?: string;
 }
 
 const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
@@ -43,13 +63,16 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
   description,
   startTime,
   endTime,
-  distance
+  image,
+  distance,
+  id
 }) => {
+  const formatTime = (time: string) => moment(time, ['h:m a', 'H:m']).format('h:mma')
   return (
-    <li className="uk-card uk-card-default uk-card-hover">
+    <li key={id} className="uk-card uk-card-default uk-card-hover">
       <a className="card">
         <div className="card-image">
-          <img src="https://www.bbcgoodfood.com/sites/default/files/guide/guide-image/2018/06/chicken-wings-main.jpg" />
+          <img src={image} />
         </div>
         <div className="card-content">
           <div className="card-top">
@@ -57,10 +80,10 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
             <span data-uk-icon="chevron-right" className="uk-text-large card-icon" />
           </div>
 
-          <p className="uk-text-meta uk-margin-remove-top card-description">Sandwiches, Mediterranean</p>
+          <p className="uk-text-meta uk-margin-remove-top card-description">{description}</p>
 
           <div className="card-bottom">
-            <p className="uk-text-meta uk-margin-remove-top card-time">6:00am to 4:45pm</p>
+            <p className="uk-text-meta uk-margin-remove-top card-time">{formatTime(startTime!)} to {formatTime(endTime!)}</p>
             <i className="ico-walk"></i>
             <span className="uk-text-meta uk-margin-remove-top">0.25km</span>
           </div>
@@ -131,6 +154,7 @@ const Container = styled.ul`
 
   .card-content {
     flex: 60%;
+    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -151,6 +175,8 @@ const Container = styled.ul`
   }
 
   .card-bottom {
+    position: absolute;
+    bottom: 5px;
     justify-self: flex-end;
     margin-bottom: 2px;
     width: 100%;
@@ -164,6 +190,7 @@ const Container = styled.ul`
 
   .card-icon {
     color: green;
+    min-width: 1.5em;
   }
 
 `;

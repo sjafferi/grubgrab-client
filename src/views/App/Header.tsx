@@ -21,7 +21,7 @@ const Logo = styled(Link)`
   color: rgb(91, 97, 124);
   font-size: 20px;
   text-decoration: none !important;
-  color: ${colors.white};
+  color: ${colors.white} !important;
 `;
 
 const Center = styled.div`
@@ -56,7 +56,7 @@ const SearchInput = styled.input`
   }
 `;
 
-const PillButtons = styled.div`
+const Locations = styled.div`
   display: flex;
   font-size: 12px;
 
@@ -110,12 +110,12 @@ export class Header extends React.Component<{ user?: User, router?: RouterStore 
           <SearchForm className="uk-search uk-search-default">
             <SearchInput className="uk-search-input" type="search" placeholder="Search categories" />
           </SearchForm>
-          <PillButtons>
+          <Locations>
             <p>in</p>
             <LocationButton className="uk-button uk-button-default">Toronto</LocationButton>
             <p>or</p>
             <LocationButton className="uk-button uk-button-default">Waterloo</LocationButton>
-          </PillButtons>
+          </Locations>
         </Center>
 
         <Right>

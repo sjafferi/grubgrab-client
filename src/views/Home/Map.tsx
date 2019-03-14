@@ -1,5 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
+import { inject, observer } from "mobx-react";
+import { Restaurant, IRestaurant } from 'stores';
 import { Map as MapUntyped, GoogleAPI, Marker as MarkerUntyped, GoogleApiWrapper } from 'google-maps-react';
 
 const Container = styled.div`
@@ -27,14 +29,31 @@ const Map: any = MapUntyped;
 const Marker: any = MarkerUntyped;
 
 interface IMapProps {
-  google?: GoogleAPI
+  restaurant?: Restaurant;
+  google?: GoogleAPI;
 }
 
 interface IMapState {
   selectedPlace: any
 }
 
+@inject("restaurant")
+@inject("user")
+@observer
 class MapContainer extends React.Component<IMapProps, IMapState> {
+  get restaurants() { return this.props.restaurant!.restaurants; }
+
+  public renderMarker = (restaurant: IRestaurant) => {
+    return (
+      <Marker
+        key={restaurant.id}
+        title={restaurant.description}
+        name={restaurant.name}
+        position={{ lat: restaurant.latitude, lng: restaurant.longitude }}
+      />
+    )
+  }
+
   render() {
     return (
       <Container>
@@ -47,11 +66,13 @@ class MapContainer extends React.Component<IMapProps, IMapState> {
           mapTypeControl={false}
           fullscreenControl={false}
           streetViewControl={false}
+          initialCenter={{
+            lat: 43.4765785,
+            lng: -80.5612137
+          }}
         >
-          <Marker
-            title={'The marker`s title will appear as a tooltip.'}
-            name={'SOMA'}
-            position={{ lat: 37.778519, lng: -122.405640 }} />
+          {this.restaurants.map(this.renderMarker)}
+
         </Map>
 
       </Container>
