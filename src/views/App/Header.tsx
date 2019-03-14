@@ -80,6 +80,7 @@ const ButtonLink = styled.a`
   background: #184c28a1 !important;
   ${SearchTextStyle}
   padding: 0 15px !important;
+  text-decoration: none !important;
 `
 
 const Right = styled.div`
