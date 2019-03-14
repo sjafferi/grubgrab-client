@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import styled, { css } from "styled-components";
-import { colors, Text } from "ui";
+import { breakpoint, colors, Text } from "ui";
 
 import { inject, observer } from "mobx-react";
-import { User, RouterStore } from 'stores';
+import { User, RouterStore, Viewport } from 'stores';
 
 const Container = styled.header`
   height: 45px;
@@ -28,6 +28,14 @@ const Center = styled.div`
   display: flex;
   color: white;
   align-items: center;
+
+  ${breakpoint.down('m')`{
+    margin: auto auto;
+
+    .uk-search {
+      width: 200px;
+    }
+  }`}
 `
 
 const SearchForm = styled.form`
@@ -97,26 +105,28 @@ const Right = styled.div`
   }
 `
 @inject("user")
+@inject("viewport")
 @inject("router")
 @observer
-export class Header extends React.Component<{ user?: User, router?: RouterStore }, {}> {
+export class Header extends React.Component<{ user?: User, router?: RouterStore, viewport?: Viewport }, {}> {
   get user() { return this.props.user!; }
+  get viewport() { return this.props.viewport!; }
 
   public render() {
     return (
       <Container>
-        <Logo to="/">GrubGrab</Logo>
+        {this.viewport.isTabletAndAbove && <Logo to="/">GrubGrab</Logo>}
 
         <Center>
           <SearchForm className="uk-search uk-search-default">
             <SearchInput className="uk-search-input" type="search" placeholder="Search categories" />
           </SearchForm>
-          <Locations>
+          {this.viewport.isTabletAndAbove && <Locations>
             <p>in</p>
             <LocationButton className="uk-button uk-button-default">Toronto</LocationButton>
             <p>or</p>
             <LocationButton className="uk-button uk-button-default">Waterloo</LocationButton>
-          </Locations>
+          </Locations>}
         </Center>
 
         <Right>

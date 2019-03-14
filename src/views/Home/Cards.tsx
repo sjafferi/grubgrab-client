@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as moment from 'moment';
 import styled from "styled-components";
-import { Header3 } from 'ui';
+import { Header3, breakpoint } from 'ui';
 import { inject, observer } from "mobx-react";
 import { User, RouterStore, Restaurant, IRestaurant } from 'stores';
 
@@ -118,6 +118,10 @@ const Container = styled.ul`
   list-style-type: none;
   padding: 5px 0;
 
+  ${breakpoint.down('m')`{
+    max-width: 100vw;
+  }`}
+
   li {
     margin: 12px 5px;
   }
@@ -186,6 +190,10 @@ const Container = styled.ul`
     span, p {
       font-size: 0.65em !important;
     }
+
+    ${breakpoint.down('m')`{
+      bottom: -5px;
+    }`}
   }
 
   .card-icon {

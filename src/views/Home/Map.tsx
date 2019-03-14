@@ -44,7 +44,7 @@ class MapContainer extends React.Component<IMapProps, IMapState> {
 
   get restaurants(): IRestaurant[] { return this.props.restaurant!.restaurants; }
 
-  get bounds() { return this.restaurants.map(({ latitude: lat, longitude: lng }) => ({ lat, lng })) }
+  get bounds() { return this.restaurants.map(({ latitude: lat, longitude: lng }) => (lat && lng && { lat, lng })) }
 
   public renderMarker = (restaurant: IRestaurant) => {
     return (
