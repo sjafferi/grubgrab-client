@@ -29,7 +29,7 @@ export default class Cards extends React.Component<ICardProps> {
   handleSelectRestaurant = async (retaurant: IRestaurant) => {
     const { result, error } = await this.props.restaurant!.fetchOne(retaurant.id!);
     if (result) {
-      this.props.state.selectedRestaurant = result;
+      this.props.state.assign({ selectedRestaurant: result, selectedMenuItems: {}, freeItem: undefined });
     }
   }
 

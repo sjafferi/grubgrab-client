@@ -1,8 +1,11 @@
 import * as React from "react";
 import styled, { StyledComponentBase } from "styled-components";
+import { assign } from 'lodash';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react';
 import { Header1, Header2, Header3, Text } from 'ui';
 import { IFoodItem } from 'stores';
-import { formatTime, formatPrice, hoursToday } from '@util';
+import { formatTime, formatCents, hoursToday } from '@util';
 import State from '../state';
 
 const Container = styled.div`
@@ -42,6 +45,10 @@ const Header: IHeaderProps = styled.div`
     font-weight: 500;
     line-height: 0.75em;
   }
+
+  .close-modal {
+
+  }
 `;
 const HeaderRow = styled.div`
   display: flex;
@@ -61,13 +68,32 @@ const MenuGroup = styled.ul`
 `;
 const MenuItem = styled.li`
   display: flex;
+  position: relative;
   justify-content: center;
   width: 80%;
   margin-left: 15%;
   padding: 0.5% 2.5% 0 2.5%;
 
   .price {
-    font-size: 0.875em;
+    font-size: 0.75em;
+    text-decoration: line-through;
+  }
+
+  .selected.price {
+    text-decoration: none;
+  }
+
+  span.uk-text-meta {
+    line-height: inherit;
+    margin-left: 5px;
+  }
+
+  .radio {
+    position: absolute;
+    top: 16%;
+    left: -7%;
+    width: 16px;
+    height: 16px;
   }
 
   &:hover {
@@ -93,8 +119,26 @@ interface IMenuProps {
   state: State;
 }
 
-
+@observer
 export default class Menu extends React.Component<IMenuProps> {
+
+  public close = () => {
+    this.props.state.assign({ selectedRestaurant: undefined, selectedMenuItems: {} });
+  }
+
+  public select = (type: string, id: string) => {
+    const copy = assign({}, toJS(this.selected));
+    if (!copy[type]) copy[type] = {};
+    copy[type][id] = !copy[type][id];
+    // const freeItem = copy[type][id] ? id : this.props.state.freeItem;
+    const freeItem = id;
+
+    this.props.state.assign({ selectedMenuItems: copy, freeItem });
+  }
+
+  get selected() {
+    return this.props.state.selectedMenuItems;
+  }
 
   get restaurant() {
     return this.props.state.selectedRestaurant!;
@@ -125,15 +169,22 @@ export default class Menu extends React.Component<IMenuProps> {
     return (
       <MenuGroup>
         <Header2 className="uk-text-lead">{group}s</Header2>
-        {menu.map(({ name, description, priceCents }) => (
-          <MenuItem className="uk-card uk-card-hover">
-            <MenuItemColumn>
-              <Header3>{name}</Header3>
-              <Text className="uk-text-meta">{description}</Text>
-            </MenuItemColumn>
-            {formatPrice(priceCents)}
-          </MenuItem>
-        ))}
+        {menu.map(({ name, description, priceCents, id }) => {
+          const selected = this.selected[group] !== undefined && !this.selected[group][id!];
+          const free = this.props.state.freeItem !== id;
+          return (
+            <MenuItem key={id} className="uk-card uk-card-hover" onClick={() => this.select(group, id!)}>
+              <input className="radio uk-radio" type="radio" name="radio2" checked={!free} />
+              {/* <Radio checked={!selected} /> */}
+              <MenuItemColumn>
+                <Header3>{name}</Header3>
+                <Text className="uk-text-meta">{description}</Text>
+              </MenuItemColumn>
+              <Price className={free ? "selected" : ""} priceCents={priceCents} />
+              {!free && <span className="uk-text-meta">free</span>}
+            </MenuItem>
+          )
+        })}
       </MenuGroup>
     )
   }
@@ -143,6 +194,7 @@ export default class Menu extends React.Component<IMenuProps> {
 
     return (
       <Container>
+        <CloseButton close={this.close} />
         <Header>
           <Header1 className="uk-text-lead">{name.length > 30 ? name.substring(0, 27) : name}</Header1>
           <HeaderRow>
@@ -157,3 +209,26 @@ export default class Menu extends React.Component<IMenuProps> {
     );
   }
 }
+
+const Price: React.SFC<{ priceCents: number, className?: string }> = ({ priceCents, className }) => {
+  const priceDollars = formatCents({ cents: priceCents });
+
+  const cents = priceDollars.substr(-2);
+  const whole = priceDollars.substr(0, priceDollars.length - 3);
+
+  return (
+    <span className={`price ${className ? className : ""}`}>
+      ${whole}.{cents}
+    </span>
+  );
+}
+
+const CloseButton: React.SFC<{ close: () => void }> = ({ close }) => (
+  <button className={`close-modal uk-modal-close-default`} onClick={close}>
+    <span data-uk-icon="close" className="uk-text-medium" />
+  </button>
+)
+
+const Radio: React.SFC<{ checked: boolean }> = observer(({ checked }) => (
+  <input className="radio uk-radio" type="radio" name="radio2" checked={checked} />
+));

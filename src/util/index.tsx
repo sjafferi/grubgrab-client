@@ -1,5 +1,4 @@
 import * as moment from 'moment';
-import * as React from 'react';
 import { IRestaurant } from 'stores';
 
 export const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -22,7 +21,7 @@ interface IFormatCents {
   dropCentsRoundUp?: boolean;
   maximumFractionDigits?: number;
 }
-export default function formatCents({
+export function formatCents({
   cents,
   round,
   dropEmptyCents = false,
@@ -54,17 +53,4 @@ export default function formatCents({
     returnValue = returnValue.replace(/,/g, '');
   }
   return returnValue;
-}
-
-export function formatPrice(priceCents: number) {
-  const priceDollars = formatCents({ cents: priceCents });
-
-  const cents = priceDollars.substr(-2);
-  const whole = priceDollars.substr(0, priceDollars.length - 3);
-
-  return (
-    <span className="price">
-      ${whole}.{cents}
-    </span>
-  );
 }
