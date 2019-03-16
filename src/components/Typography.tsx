@@ -15,13 +15,26 @@ export const Header1 = styled.h1`
   ${breakpoint.down('m')`{
     text-align: center;
   }`}
-`;
+`
+
+export const Header2: any = styled.h2`
+  font-family: 'Open Sans', serif;
+  font-weight: 400;
+  font-size: 1.5em;
+  line-height: 1em;
+  letter-spacing: 0.025em;
+  text-transform: capitalize;
+
+  ${(props: any) => props.center ? `
+    text-align: center;
+  ` : ''}
+`;;
 
 export const Header3: any = styled.h3`
   font-family: 'Open Sans', serif;
   font-weight: 300;
   font-size: 1.25em;
-  line-height: 2em;
+  line-height: 1em;
   letter-spacing: 0.025em;
   text-transform: capitalize;
 

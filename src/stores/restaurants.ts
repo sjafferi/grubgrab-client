@@ -1,6 +1,7 @@
 import { action, computed, observable } from 'mobx';
+import { assign } from 'lodash';
 import { RootStore, IUser } from './index';
-import { fetchRestaurants } from 'api'
+import { fetchRestaurant, fetchRestaurants } from 'api'
 
 export interface IRestaurantImages {
   id?: string;
@@ -13,6 +14,15 @@ export interface IRestaurantHours {
   day: string;
   openTime: string;
   closeTime: string;
+}
+
+export interface IFoodItem {
+  id?: string,
+  name: string,
+  description: string,
+  priceCents: number,
+  calories: number,
+  type: string,
 }
 
 export interface IRestaurant {
@@ -28,6 +38,7 @@ export interface IRestaurant {
   categories?: string[],
   hours?: IRestaurantHours[],
   images?: IRestaurantImages[],
+  menu?: IFoodItem[],
 }
 
 export class Restaurant {
@@ -53,6 +64,28 @@ export class Restaurant {
 
     if (result) {
       this.restaurants = result;
+    }
+
+    return { result, error };
+  }
+
+  @action
+  fetchOne = async (id: string) => {
+    let result, error;
+    const index = this.restaurants.findIndex(({ id: restaurantId }) => id === restaurantId);
+
+    if (this.restaurants[index].menu) return { result: this.restaurants[index] };
+
+    try {
+      const response = await fetchRestaurant(id);
+      if (!response.error) result = response
+      else error = response.error;
+    } catch (e) {
+      error = e;
+    }
+
+    if (result) {
+      assign(this.restaurants[index], result);
     }
 
     return { result, error };

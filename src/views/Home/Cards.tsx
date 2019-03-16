@@ -1,39 +1,51 @@
 import * as React from "react";
-import * as moment from 'moment';
 import styled from "styled-components";
 import { Header3, breakpoint } from 'ui';
+import { formatTime, hoursToday } from '@util';
 import { inject, observer } from "mobx-react";
 import { User, RouterStore, Restaurant, IRestaurant } from 'stores';
-
-const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+import State from './state';
 
 interface ICardProps {
   user?: User;
   router?: RouterStore;
   restaurant?: Restaurant;
+  state: State;
 }
 
 @inject("restaurant")
 @inject("user")
 @observer
 export default class Cards extends React.Component<ICardProps> {
+
   componentWillMount() {
     this.props.restaurant!.fetch();
   }
 
-  get restaurants() { return this.props.restaurant!.restaurants; }
+  get restaurants() {
+    return this.props.restaurant!.restaurants;
+  }
 
-  public renderRestaurant = ({ name, hours, categories, images, id }: IRestaurant) => {
-    const today: string = daysOfWeek[new Date().getDay()];
-    const hoursToday = hours!.filter(({ day }) => day === today);
+  handleSelectRestaurant = async (retaurant: IRestaurant) => {
+    const { result, error } = await this.props.restaurant!.fetchOne(retaurant.id!);
+    if (result) {
+      this.props.state.selectedRestaurant = result;
+    }
+  }
+
+  renderRestaurant = (restaurant: IRestaurant) => {
+    const { name, hours, categories, images, id } = restaurant;
+    const parsedHours = hoursToday(hours) || {};
+    const image = images!.find(({ description }) => description.includes('listImageMobileUrl'));
     return (
       <RestaurantCard
         name={name}
         description={categories!.slice(0, 3).join(', ')}
-        startTime={hoursToday[0].openTime}
-        endTime={hoursToday[0].closeTime}
-        image={images![0].url}
+        startTime={parsedHours.openTime}
+        endTime={parsedHours.closeTime}
+        image={image!.url}
         key={id}
+        onClick={() => this.handleSelectRestaurant(restaurant)}
       />
     )
   }
@@ -54,6 +66,7 @@ interface IRestaurtCardProps {
   endTime?: string;
   distance?: string;
   image?: string;
+  onClick: () => void
 }
 
 const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
@@ -62,18 +75,18 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
   startTime,
   endTime,
   image,
-  distance,
+  onClick,
 }) => {
-  const formatTime = (time: string) => moment(time, ['h:m a', 'H:m']).format('h:mma')
+
   return (
     <li className="uk-card uk-card-default uk-card-hover">
-      <a className="card">
+      <a className="card" onClick={onClick}>
         <div className="card-image">
           <img src={image} />
         </div>
         <div className="card-content">
           <div className="card-top">
-            <Header3 className="uk-card-title uk-margin-remove-bottom card-title">{name}</Header3>
+            <Header3 className="uk-card-title uk-margin-remove-bottom card-title">{name && name.length > 30 ? name.substring(0, 27) : name}</Header3>
             <span data-uk-icon="chevron-right" className="uk-text-large card-icon" />
           </div>
 
@@ -187,6 +200,10 @@ const Container = styled.ul`
     span, p {
       font-size: 0.65em !important;
     }
+
+    ${breakpoint.down('xl')`{
+      bottom: 0px;
+    }`}  
 
     ${breakpoint.down('m')`{
       bottom: -5px;

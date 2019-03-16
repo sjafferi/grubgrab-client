@@ -12,6 +12,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const DEV_MODE = NODE_ENV !== "production";
 const PORT = process.env.PORT || 3000;
 const API_HOST = DEV_MODE ? "http://localhost:9010" : "https://api.grubgrab.io"
+// const API_HOST = "https://api.grubgrab.io";
 
 const FAVICON_DIR = "./src/assets/favicon/favicon.png";
 const TITLE = "Grub Grab - Your Local Grub Guru";
@@ -67,6 +68,7 @@ module.exports = {
       "assets": path.resolve(__dirname, "src/assets"),
       "consts": path.resolve(__dirname, "src/consts"),
       "api": path.resolve(__dirname, "src/api"),
+      "@util": path.resolve(__dirname, "src/util"),
     }
   },
   output: {

@@ -1,7 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { inject, observer } from "mobx-react";
+import State from './state';
 import Cards from './Cards'
 import Map from './Map';
+import Menu from './Menu';
+import { User, RouterStore } from 'stores';
 import { breakpoint } from 'ui'
 
 const Container = styled.div`
@@ -17,14 +21,25 @@ const Container = styled.div`
   }`}
 `;
 
+interface IHomeProps {
+  user?: User;
+  router?: RouterStore;
+}
 
-export class Home extends React.Component {
+@observer
+export class Home extends React.Component<IHomeProps> {
+  public homeState = new State();
+
+  get selected() {
+    return this.homeState.selectedRestaurant;
+  }
 
   public render() {
     return (
       <Container>
-        <Cards />
-        <Map />
+        <Cards state={this.homeState} />
+        {!this.selected && <Map />}
+        {this.selected && <Menu state={this.homeState} />}
       </Container>
     );
   }
