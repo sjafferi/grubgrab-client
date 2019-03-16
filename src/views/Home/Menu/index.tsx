@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled, { StyledComponentBase } from "styled-components";
-import { assign } from 'lodash';
+import { assign, some, values } from 'lodash';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { Header1, Header2, Header3, Text } from 'ui';
@@ -94,6 +94,7 @@ const MenuItem = styled.li`
     left: -7%;
     width: 16px;
     height: 16px;
+    background-url: none !important;
   }
 
   &:hover {
@@ -104,6 +105,7 @@ const MenuItemColumn = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  outline-style: none;
 
   p.uk-text-meta {
     padding-left: 15px;
@@ -123,21 +125,33 @@ interface IMenuProps {
 export default class Menu extends React.Component<IMenuProps> {
 
   public close = () => {
-    this.props.state.assign({ selectedRestaurant: undefined, selectedMenuItems: {} });
+    this.props.state.assign({ selectedRestaurant: undefined });
   }
 
   public select = (type: string, id: string) => {
     const copy = assign({}, toJS(this.selected));
-    if (!copy[type]) copy[type] = {};
+    if (!copy[type]) copy[type] = { [id]: false };
     copy[type][id] = !copy[type][id];
-    // const freeItem = copy[type][id] ? id : this.props.state.freeItem;
-    const freeItem = id;
-
+    const noneSelected = !some(values(copy[type]));
+    let freeItem;
+    if (noneSelected) {
+      freeItem = undefined;
+    } else if (copy[type][id]) {
+      freeItem = id;
+    } else if (id === this.freeItem) { // unselected current
+      freeItem = Object.entries(copy[type]).find(([id, selected]) => selected)![0];
+    } else {
+      freeItem = this.freeItem;
+    }
     this.props.state.assign({ selectedMenuItems: copy, freeItem });
   }
 
   get selected() {
     return this.props.state.selectedMenuItems;
+  }
+
+  get freeItem() {
+    return this.props.state.freeItem;
   }
 
   get restaurant() {
@@ -170,18 +184,18 @@ export default class Menu extends React.Component<IMenuProps> {
       <MenuGroup>
         <Header2 className="uk-text-lead">{group}s</Header2>
         {menu.map(({ name, description, priceCents, id }) => {
-          const selected = this.selected[group] !== undefined && !this.selected[group][id!];
-          const free = this.props.state.freeItem !== id;
+          const selected = this.selected[group] && this.selected[group][id!];
+          const free = !(this.selected[group] !== undefined && this.freeItem !== id) || this.freeItem === undefined;
           return (
             <MenuItem key={id} className="uk-card uk-card-hover" onClick={() => this.select(group, id!)}>
-              <input className="radio uk-radio" type="radio" name="radio2" checked={!free} />
+              <input className="radio uk-radio" type="radio" name={`radio-${id}`} checked={selected} />
               {/* <Radio checked={!selected} /> */}
               <MenuItemColumn>
                 <Header3>{name}</Header3>
                 <Text className="uk-text-meta">{description}</Text>
               </MenuItemColumn>
-              <Price className={free ? "selected" : ""} priceCents={priceCents} />
-              {!free && <span className="uk-text-meta">free</span>}
+              <Price className={!free ? "selected" : ""} priceCents={priceCents} />
+              {free && <span className="uk-text-meta">free</span>}
             </MenuItem>
           )
         })}
