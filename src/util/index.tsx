@@ -64,10 +64,7 @@ export function formatPrice(priceCents: number) {
 
   return (
     <span className="price">
-      <span className="sign">$</span>
-      <span className="dollars">{whole}</span>
-      <span className="dot">.</span>
-      <span className="cents">{cents}</span>
+      ${whole}.{cents}
     </span>
   );
 }
