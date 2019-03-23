@@ -32,6 +32,7 @@ const Container = styled.div`
   ${breakpoint.down('m')`{
     .uk-modal-dialog {
       min-height: 43%;
+      min-width: 100%;
       padding: 30px;
       transform: translateY(45%);
     }

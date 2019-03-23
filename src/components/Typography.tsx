@@ -61,7 +61,7 @@ export const TextStyle = css`
   text-align: left;
   font-size: 14px;
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.5em;
   letter-spacing: 0.02em;
 `
 

@@ -130,6 +130,11 @@ const Container = styled.ul`
 
   list-style-type: none;
   padding: 5px 0;
+  overflow: scroll;
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
 
   ${breakpoint.down('m')`{
     max-width: 100vw;

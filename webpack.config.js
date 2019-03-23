@@ -11,8 +11,8 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const NODE_ENV = process.env.NODE_ENV || "development";
 const DEV_MODE = NODE_ENV !== "production";
 const PORT = process.env.PORT || 3000;
-const API_HOST = DEV_MODE ? "http://localhost:9010" : "https://api.grubgrab.io"
-// const API_HOST = "https://api.grubgrab.io";
+// const API_HOST = DEV_MODE ? "http://localhost:9010" : "https://api.grubgrab.io"
+const API_HOST = "https://api.grubgrab.io";
 
 const FAVICON_DIR = "./src/assets/favicon/favicon.png";
 const TITLE = "Grub Grab - Your Local Grub Guru";
@@ -98,7 +98,7 @@ module.exports = {
       template: "./src/index.html",
       title: TITLE,
       environment: NODE_ENV,
-      zoom: NODE_ENV === "production" ? 1.2 : 1.1,
+      zoom: NODE_ENV === "production" ? 1.1 : 1.1,
       filename: "index.html"
     }),
     ...(FAVICON_DIR ? [new WebappWebpackPlugin(FAVICON_DIR)] : []),

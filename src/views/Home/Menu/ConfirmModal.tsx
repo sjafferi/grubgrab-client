@@ -6,17 +6,40 @@ import { observer } from "mobx-react";
 import State from '../state';
 import { IFoodItem } from 'stores';
 import { hoursToday } from '@util';
-import { breakpoint, Column, Modal, Header3, Primary, Row, Spacer, Text, TimePicker } from 'ui';
+import { breakpoint, colors, Column, Modal, Header3, Primary, Row, Spacer, Text, TimePicker } from 'ui';
 
 const Container = styled(Modal)`
+  .uk-modal-dialog {
+    transform: translateY(30%);
+    min-width: 35%;
+  }
+  
   .title {
     line-height: 0;
   }
+
+  ${breakpoint.down('m')`{
+    min-height: 50%;
+  }`}
 `
 
 const Items = styled.ul`
-  // list-style-type: circle;
-  padding-left: 20px;
+  list-style-type: none;
+
+  li:before {
+    content: '–';
+    position: absolute;
+    margin-left: -20px;
+    margin-top: -7px;
+  }
+
+  border: 1px dashed ${colors.blackish};
+  padding: 15%;
+
+
+  ${breakpoint.down('m')`{
+    padding: 7% 15% 2% 15%;
+  }`}
 `
 
 const Item = styled.li`
@@ -31,11 +54,7 @@ const Item = styled.li`
 `;
 
 const BottomContainer = styled(Row)`
-  ${breakpoint.down('m')`{
-    position: absolute;
-    bottom: 10%;
-    left: 20%;
-  }`}
+
 `
 
 const TimeContainer = styled.div`
@@ -78,7 +97,7 @@ export default class ConfirmModal extends React.Component<{ state: State, onClos
       <Items>
         {items.map(({ name, type, id }) => (
           <Item key={id}>
-            <Text>{type} - {name}</Text>
+            <Text>{type}: {name}</Text>
           </Item>
         ))}
       </Items>
