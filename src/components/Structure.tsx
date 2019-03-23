@@ -11,8 +11,12 @@ export const Section: any = styled.div`
   ` : ''}
 `;
 
-export const Row = styled.div`
+export const Row: any = styled.div`
   display: flex;
+
+  ${(props: any) => props.center ? `
+    justify-content: center;
+  ` : ''}
 `;
 
 export const Column: any = styled.div`

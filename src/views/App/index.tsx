@@ -9,8 +9,8 @@ import { Home } from "../Home";
 import { inject, observer } from "mobx-react";
 import { User, RouterStore } from 'stores';
 
-import * as UIkit from 'uikit';
-import * as Icons from 'uikit/dist/js/uikit-icons';
+import UIkit from 'uikit';
+import Icons from 'uikit/dist/js/uikit-icons';
 import "normalize.css";
 import "uikit/dist/js/uikit.min.js";
 import "uikit/dist/css/uikit.min.css";

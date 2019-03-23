@@ -1,7 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Header3, breakpoint } from 'ui';
+import { colors, Header3, breakpoint } from 'ui';
 import { formatTime, hoursToday } from '@util';
+import { toJS } from 'mobx';
 import { inject, observer } from "mobx-react";
 import { User, RouterStore, Restaurant, IRestaurant } from 'stores';
 import State from './state';
@@ -43,7 +44,7 @@ export default class Cards extends React.Component<ICardProps> {
         description={categories!.slice(0, 3).join(', ')}
         startTime={parsedHours.openTime}
         endTime={parsedHours.closeTime}
-        image={image!.url}
+        image={image && image.url}
         key={id}
         onClick={() => this.handleSelectRestaurant(restaurant)}
       />
@@ -52,7 +53,7 @@ export default class Cards extends React.Component<ICardProps> {
 
   public render() {
     return (
-      <Container>
+      <Container className="cards">
         {this.restaurants.map(this.renderRestaurant)}
       </Container>
     );
@@ -78,6 +79,8 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
   onClick,
 }) => {
 
+  const time = startTime && endTime ? `${formatTime(startTime!)} to ${formatTime(endTime!)}` : '';
+
   return (
     <li className="uk-card uk-card-default uk-card-hover">
       <a className="card" onClick={onClick}>
@@ -93,7 +96,7 @@ const RestaurantCard: React.SFC<IRestaurtCardProps> = ({
           <p className="uk-text-meta uk-margin-remove-top card-description">{description}</p>
 
           <div className="card-bottom">
-            <p className="uk-text-meta uk-margin-remove-top card-time">{formatTime(startTime!)} to {formatTime(endTime!)}</p>
+            <p className="uk-text-meta uk-margin-remove-top card-time">{time}</p>
             <i className="ico-walk"></i>
             <span className="uk-text-meta uk-margin-remove-top">0.25km</span>
           </div>
@@ -123,7 +126,7 @@ const Container = styled.ul`
   display: block;
   max-width: 52vh;
   height: 100%;
-  background: #f6f6f7;
+  background: ${colors.lightGrey};
 
   list-style-type: none;
   padding: 5px 0;
@@ -174,6 +177,10 @@ const Container = styled.ul`
     flex-direction: column;
   }
 
+  .card-description {
+    font-size: 0.85em;
+  }
+
   .card-top {
     justify-self: flex-start;
     width: 100%;
@@ -198,7 +205,7 @@ const Container = styled.ul`
     justify-content: space-between;
 
     span, p {
-      font-size: 0.65em !important;
+      font-size: 0.85em !important;
     }
 
     ${breakpoint.down('xl')`{

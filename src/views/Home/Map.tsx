@@ -65,7 +65,7 @@ class MapContainer extends React.Component<IMapProps, IMapState> {
     return (
       <Container>
         <Map
-          zoom={16}
+          zoom={15}
           className='map'
           style={{ width: '100%', height: '100%', position: 'relative' }}
           google={this.props.google!}

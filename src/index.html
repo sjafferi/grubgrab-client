@@ -6,13 +6,12 @@
   <meta charset="UTF-8" />
   <title><%= htmlWebpackPlugin.options.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yegor256/tacit@gh-pages/tacit-css-1.4.1.min.css" />
+  <link rel="stylesheet" href="css/tacit.min.css" />
+  <link rel="stylesheet" href="css/inter.min.css" />
   <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,600,700|Open+Sans:300,400,600,700|Roboto:300,400"
     rel="stylesheet">
 
   <style>
-    @import url('https://rsms.me/inter/inter.css');
-
     body {
       padding: 0;
       margin: 0;
@@ -25,6 +24,15 @@
 
     #app {
       height: 100%;
+    }
+
+    .timepicker-popup {
+      margin-left: 150px;
+      margin-top: 12%;
+    }
+
+    .rc-time-picker-panel-select::-webkit-scrollbar {
+      width: 6px;
     }
 
     a,

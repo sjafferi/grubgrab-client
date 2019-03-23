@@ -90,7 +90,10 @@ module.exports = {
       "process.env.MAPS_API_KEY": JSON.stringify(process.env.MAPS_API_KEY),
       "process.env.API_HOST": JSON.stringify(API_HOST),
     }),
-    new CopyWebpackPlugin([]),
+    new CopyWebpackPlugin([{
+      from: "./src/assets/css",
+      to: "css"
+    }]),
     new HtmlWebpackPlugin({
       template: "./src/index.html",
       title: TITLE,

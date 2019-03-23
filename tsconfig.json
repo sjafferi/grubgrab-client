@@ -6,6 +6,7 @@
     "module": "commonjs",
     "jsx": "react",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "allowJs": true,
     "sourceMap": true,
     "experimentalDecorators": true,

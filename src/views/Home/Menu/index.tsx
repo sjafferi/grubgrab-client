@@ -2,11 +2,12 @@ import * as React from "react";
 import styled, { StyledComponentBase } from "styled-components";
 import { assign, some, values } from 'lodash';
 import { toJS } from 'mobx';
-import { observer } from 'mobx-react';
-import { Header1, Header2, Header3, Text } from 'ui';
-import { IFoodItem } from 'stores';
+import { inject, observer } from 'mobx-react';
+import { colors, breakpoint, Header1, Header2, Header3, Text, Primary, Spacer } from 'ui';
+import { IFoodItem, Viewport } from 'stores';
 import { formatTime, formatCents, hoursToday } from '@util';
 import State from '../state';
+import ConfirmModal from './ConfirmModal';
 
 const Container = styled.div`
   height: 100%;
@@ -21,6 +22,10 @@ const Container = styled.div`
   ::-webkit-scrollbar {
     width: 6px;
   }
+
+  ${breakpoint.down('m')`{
+    left: 0;
+  }`}
 `;
 
 interface IHeaderProps extends StyledComponentBase<any, any, any, any> {
@@ -28,11 +33,11 @@ interface IHeaderProps extends StyledComponentBase<any, any, any, any> {
 }
 const Header: IHeaderProps = styled.div`
   width: 100%;
-  height: 100px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 15px;
+  padding: 25px;
   margin-top: 5px;
 
   background-image: url('${(props: any) => props.backgroundImage ? props.backgroundImage : ''}');
@@ -45,6 +50,12 @@ const Header: IHeaderProps = styled.div`
     font-weight: 500;
     line-height: 0.75em;
   }
+
+  ${breakpoint.down('m')`{
+    h1 {
+      line-height 1.75em;
+    }
+  }`}
 
   .close-modal {
 
@@ -65,6 +76,12 @@ const MenuGroup = styled.ul`
   h2 {
     margin-left: 15%;
   }
+
+  ${breakpoint.down('m')`{
+    h2 {
+      margin-left: 10%;
+    }
+  }`}
 `;
 const MenuItem = styled.li`
   display: flex;
@@ -73,6 +90,7 @@ const MenuItem = styled.li`
   width: 80%;
   margin-left: 15%;
   padding: 0.5% 2.5% 0 2.5%;
+  user-select: none;
 
   .price {
     font-size: 0.75em;
@@ -89,9 +107,7 @@ const MenuItem = styled.li`
   }
 
   .radio {
-    position: absolute;
-    top: 16%;
-    left: -7%;
+    align-self: center;
     width: 16px;
     height: 16px;
     background-url: none !important;
@@ -100,6 +116,18 @@ const MenuItem = styled.li`
   &:hover {
     cursor: pointer;
   }
+
+  ${breakpoint.down('m')`{
+    width: 94%;
+    margin-left: 4.5%;
+    padding: 5px 0;
+    margin-bottom: 5%;
+    min-height: 90px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }`}
 `;
 const MenuItemColumn = styled.div`
   width: 100%;
@@ -115,14 +143,51 @@ const MenuItemColumn = styled.div`
     margin: 0;
     font-size: 1em;
   }
-`
+
+  ${breakpoint.down('m')`{
+    width: 70%;
+  }`}
+`;
+
+const CheckoutButtonRow = styled.div`
+  height: 70px;
+  /* width: calc(100% - 52vh); */
+  width: 100%;
+  margin-right: -52vh;
+  padding-right: 52vh;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 52vh;
+  margin: 10px 0 0 0;
+  background-color: ${colors.lightGrey};
+
+  button {
+    width: 200px;
+  }
+
+
+  ${breakpoint.down('m')`{
+    padding-right: 0;
+    left: 0;
+  }`}
+`;
+
 
 interface IMenuProps {
   state: State;
+  viewport?: Viewport;
 }
 
+@inject("viewport")
 @observer
-export default class Menu extends React.Component<IMenuProps> {
+export default class Menu extends React.Component<IMenuProps, { showConfirm: boolean }> {
+  state = {
+    showConfirm: false
+  }
 
   public close = () => {
     this.props.state.assign({ selectedRestaurant: undefined });
@@ -130,20 +195,14 @@ export default class Menu extends React.Component<IMenuProps> {
 
   public select = (type: string, id: string) => {
     const copy = assign({}, toJS(this.selected));
-    if (!copy[type]) copy[type] = { [id]: false };
-    copy[type][id] = !copy[type][id];
-    const noneSelected = !some(values(copy[type]));
-    let freeItem;
-    if (noneSelected) {
-      freeItem = undefined;
-    } else if (copy[type][id]) {
-      freeItem = id;
-    } else if (id === this.freeItem) { // unselected current
-      freeItem = Object.entries(copy[type]).find(([id, selected]) => selected)![0];
-    } else {
-      freeItem = this.freeItem;
-    }
-    this.props.state.assign({ selectedMenuItems: copy, freeItem });
+    if (id !== copy[type]) copy[type] = id;
+    else copy[type] = "";
+
+    this.props.state.assign({ selectedMenuItems: copy });
+  }
+
+  get hasSelected() {
+    return some(values(this.selected["entree"])) || some(values(this.selected["side"]));
   }
 
   get selected() {
@@ -177,25 +236,28 @@ export default class Menu extends React.Component<IMenuProps> {
     return types;
   }
 
+  toggleConfirm = () => {
+    this.setState({ showConfirm: !this.state.showConfirm });
+  }
+
   renderMenuGroup(group: "entree" | "side" | "dessert") {
     const menu = this.menu[group];
     if (!menu.length) return;
+
+    const className = this.props.viewport!.isTabletAndAbove ? "uk-card-hover" : "uk-card-default";
+
     return (
       <MenuGroup>
         <Header2 className="uk-text-lead">{group}s</Header2>
         {menu.map(({ name, description, priceCents, id }) => {
-          const selected = this.selected[group] && this.selected[group][id!];
-          const free = !(this.selected[group] !== undefined && this.freeItem !== id) || this.freeItem === undefined;
+          const selected = !!(this.selected[group] && this.selected[group] === id);
           return (
-            <MenuItem key={id} className="uk-card uk-card-hover" onClick={() => this.select(group, id!)}>
-              <input className="radio uk-radio" type="radio" name={`radio-${id}`} checked={selected} />
-              {/* <Radio checked={!selected} /> */}
+            <MenuItem key={id} className={`uk-card ${className}`} onClick={() => this.select(group, id!)}>
               <MenuItemColumn>
                 <Header3>{name}</Header3>
                 <Text className="uk-text-meta">{description}</Text>
               </MenuItemColumn>
-              <Price className={!free ? "selected" : ""} priceCents={priceCents} />
-              {free && <span className="uk-text-meta">free</span>}
+              <input className="radio uk-radio" type="radio" name={`radio-${id}`} checked={selected} readOnly />
             </MenuItem>
           )
         })}
@@ -219,6 +281,11 @@ export default class Menu extends React.Component<IMenuProps> {
         {this.renderMenuGroup("entree")}
         {this.renderMenuGroup("side")}
         {this.renderMenuGroup("dessert")}
+        {this.hasSelected && <Spacer height={70} />}
+        {this.hasSelected && <CheckoutButtonRow>
+          <Primary onClick={this.toggleConfirm}>Schedule</Primary>
+        </CheckoutButtonRow>}
+        {this.state.showConfirm && <ConfirmModal state={this.props.state} onClose={this.toggleConfirm} />}
       </Container>
     );
   }

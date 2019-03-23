@@ -24,7 +24,7 @@ export class User {
     if (user) {
       const cached = JSON.parse(user); // this needs fixing
       if (cached.id) {
-        this.user = cached;
+        // this.user = cached;
         // this.validateUser();
       }
     }

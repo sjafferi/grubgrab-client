@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import moment from 'moment';
 import { IRestaurant } from 'stores';
 
 export const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -6,7 +6,7 @@ export const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday
 export const formatTime = (time: string) => moment(time, ['h:m a', 'H:m']).format('h:mma')
 
 export const hoursToday = (hours: IRestaurant["hours"]) => {
-  const today: string = daysOfWeek[new Date().getDay()];
+  const today: string = daysOfWeek[new Date().getDay() - 1];
   const hoursToday = hours!.filter(({ day }) => day === today);
   return hoursToday[0];
 }

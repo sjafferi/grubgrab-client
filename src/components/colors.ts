@@ -2,9 +2,12 @@ export const colors = {
   blue: "#2980b9",
   lightBlue: "#3498db",
   white: "#fff",
-  gray: "rgb(91, 97, 124)",
-  lightGray: "rgb(244, 244, 246)",
-  darkGray: "#2e3c4b",
+
+  lightGrey: "#f6f6f7",
+  grey: "#5e5e5e",
+  darkGrey: "#2e3c4b",
+
+  blackish: "#333",
 
   lightThemeColor: "#38ef7d",
   themeColor: "#0e572b",

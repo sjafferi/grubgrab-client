@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { BREAKPOINTS } from 'consts';
 import styledBreakpoint from '@humblebee/styled-components-breakpoint';
 
@@ -34,7 +34,7 @@ export const Header3: any = styled.h3`
   font-family: 'Open Sans', serif;
   font-weight: 300;
   font-size: 1.25em;
-  line-height: 1em;
+  line-height: 1.5em;
   letter-spacing: 0.025em;
   text-transform: capitalize;
 
@@ -57,25 +57,18 @@ export const Subtitle: any = styled.p`
   ` : ''}
 `;
 
-export const Text: any = styled.p`
+export const TextStyle = css`
   text-align: left;
   font-size: 14px;
   font-weight: 400;
   line-height: 1;
   letter-spacing: 0.02em;
+`
+
+export const Text: any = styled.p`
+  ${TextStyle}
 
   ${(props: any) => props.center ? `
     text-align: center;
   ` : ''}
 `;
-
-
-
-/**
- *
- *         <Cards>
-          <Card title="Choose a plan" subtitle="Contrary to popular belief, Lorem Ipsum is not simply random text. " />
-          <Card title="Pick a time" subtitle="Contrary to popular belief, Lorem Ipsum is not simply random text. " />
-          <Card title="Eat & Enjoy" subtitle="Contrary to popular belief, Lorem Ipsum is not simply random text. " />
-        </Cards>
-*/
