@@ -4,7 +4,7 @@ Welcome to the GrubGrab Client
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. Ask @msajaffe about deployment and ssh keys.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. Ask @sjafferi about deployment and ssh keys.
 
 ### Installing
 
