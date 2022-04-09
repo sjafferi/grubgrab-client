@@ -58,7 +58,7 @@
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "mobx-react-router": "^4.0.5",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "normalize.css": "^8.0.1",
     "query-string": "^6.3.0",
     "rc-time-picker": "^3.6.2",
